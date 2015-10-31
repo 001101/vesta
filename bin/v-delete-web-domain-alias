@@ -56,13 +56,6 @@ fi
 #----------------------------------------------------------#
 #                       Action                             #
 #----------------------------------------------------------#
-if [ "$IPV4" == "yes" ] && [ "$IPV6" == "no" ] ; then
-  tpl_suffix=""
-elif [ "$IPV4" == "no" ] && [ "$IPV6" == "yes" ] ; then
-  tpl_suffix="IPV6"
-else
-  tpl_suffix="IP46"
-fi
 
 # Defining new alias string
 ALIAS=$(echo "$ALIAS" |\
@@ -70,7 +63,7 @@ ALIAS=$(echo "$ALIAS" |\
     sed -e "s/^$dom_alias$//g"|\
     sed -e "/^$/d"|\
     sed -e ':a;N;$!ba;s/\n/,/g')
-tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL$tpl_suffix.tpl"
+tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.tpl"
 conf="$HOMEDIR/$user/conf/web/$WEB_SYSTEM.conf"
 
 # Preparing domain values for the template substitution
@@ -81,7 +74,7 @@ del_web_config
 add_web_config
 
 if [ "$SSL" = 'yes' ]; then
-    tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL$tpl_suffix.stpl"
+    tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.stpl"
     conf="$HOMEDIR/$user/conf/web/s$WEB_SYSTEM.conf"
     del_web_config
     add_web_config
@@ -89,13 +82,13 @@ fi
 
 # Checking proxy
 if [ ! -z "$PROXY_SYSTEM" ] && [ ! -z "$PROXY" ]; then
-    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY$tpl_suffix.tpl"
+    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.tpl"
     conf="$HOMEDIR/$user/conf/web/$PROXY_SYSTEM.conf"
     del_web_config
     add_web_config
 
     if [ "$SSL" = 'yes' ]; then
-        tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY$tpl_suffix.stpl"
+        tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.stpl"
         conf="$HOMEDIR/$user/conf/web/s$PROXY_SYSTEM.conf"
         del_web_config
         add_web_config

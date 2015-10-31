@@ -113,15 +113,8 @@ exp=$(date +%F -d "+ 1 year")
 serial=$(date +'%Y%m%d01')
 ttl=14400
 
-if [ "$IPV4" == "yes" ] && [ "$IPV6" == "no" ] ; then
-  tpl_sufix=""
-elif [ "$IPV4" == "no" ] && [ "$IPV6" == "yes" ] ; then
-  tpl_sufix="IPV6"
-else
-  tpl_sufix="IP46"
-fi
 # Reading template
-template_data=$(cat $DNSTPL/$template$tpl_sufix.tpl)
+template_data=$(cat $DNSTPL/$template.tpl)
 
 # Deleting unused nameservers
 if [ -z "$ns3" ]; then

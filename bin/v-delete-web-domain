@@ -42,17 +42,10 @@ is_object_unsuspended 'web' 'DOMAIN' "$domain"
 #----------------------------------------------------------#
 #                       Action                             #
 #----------------------------------------------------------#
-if [ "$IPV4" == "yes" ] && [ "$IPV6" == "no" ] ; then
-  tpl_suffix=""
-elif [ "$IPV4" == "no" ] && [ "$IPV6" == "yes" ] ; then
-  tpl_suffix="IPV6"
-else
-  tpl_suffix="IP46"
-fi
 
 # Get template name
 get_domain_values 'web'
-tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL$tpl_suffix.tpl"
+tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.tpl"
 conf="$HOMEDIR/$user/conf/web/$WEB_SYSTEM.conf"
 ip=''
 ipv6=''
@@ -75,7 +68,7 @@ fi
 
 # Checking SSL
 if [ "$SSL" = 'yes' ]; then
-    tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL$tpl_suffix.stpl"
+    tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.stpl"
     conf="$HOMEDIR/$user/conf/web/s$WEB_SYSTEM.conf"
     del_web_config
 
@@ -91,12 +84,12 @@ fi
 
 # Checking proxy
 if [ ! -z "$PROXY_SYSTEM" ] && [ ! -z "$PROXY" ]; then
-    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY$tpl_suffix.tpl"
+    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.tpl"
     conf="$HOMEDIR/$user/conf/web/$PROXY_SYSTEM.conf"
     del_web_config
 
     if [ "$SSL" = 'yes' ]; then
-        tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY$tpl_suffix.stpl"
+        tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.stpl"
         conf="$HOMEDIR/$user/conf/web/s$PROXY_SYSTEM.conf"
         del_web_config
     fi

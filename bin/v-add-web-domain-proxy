@@ -50,19 +50,11 @@ is_proxy_template_valid $template
 #                       Action                             #
 #----------------------------------------------------------#
 
-if [ "$IPV4" == "yes" ] && [ "$IPV6" == "no" ] ; then
-  tpl_sufix=""
-elif [ "$IPV4" == "no" ] && [ "$IPV6" == "yes" ] ; then
-  tpl_sufix="IPV6"
-else
-  tpl_sufix="IP46"
-fi
-
 # Defining domain parameters
 get_domain_values 'web'
 PROXY="$template"
 PROXY_EXT="$extentions"
-tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY$tpl_sufix.tpl"
+tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.tpl"
 conf="$HOMEDIR/$user/conf/web/$PROXY_SYSTEM.conf"
 ip=''
 ipv6=''
@@ -89,7 +81,7 @@ fi
 
 # Checking ssl
 if [ "$SSL" = 'yes' ]; then
-    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY$tpl_sufix.stpl"
+    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.stpl"
     conf="$HOMEDIR/$user/conf/web/s$PROXY_SYSTEM.conf"
     add_web_config
 

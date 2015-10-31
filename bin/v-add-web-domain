@@ -103,18 +103,10 @@ if [ "$IPV6" == "yes" ] ; then
   ipv6_name=$(get_ipv6_name)
 fi
 
-if [ "$IPV4" == "yes" ] && [ "$IPV6" == "no" ] ; then
-  tpl_sufix=""
-elif [ "$IPV4" == "no" ] && [ "$IPV6" == "yes" ] ; then
-  tpl_sufix="IPV6"
-else
-  tpl_sufix="IP46"
-fi
-
 group="$user"
 email="info@$domain"
 docroot="$HOMEDIR/$user/web/$domain/public_html"
-tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$template$tpl_sufix.tpl"
+tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$template.tpl"
 conf="$HOMEDIR/$user/conf/web/$WEB_SYSTEM.conf"
 
 # Defining domain aliases
@@ -218,7 +210,7 @@ fi
 # Checking proxy system
 if [ ! -z "$PROXY_SYSTEM" ]; then
     PROXY_EXT="$extentions"
-    tpl_file="$WEBTPL/$PROXY_SYSTEM/$proxy$tpl_sufix.tpl"
+    tpl_file="$WEBTPL/$PROXY_SYSTEM/$proxy.tpl"
     conf="$HOMEDIR/$user/conf/web/$PROXY_SYSTEM.conf"
     add_web_config
     chown root:$user $conf

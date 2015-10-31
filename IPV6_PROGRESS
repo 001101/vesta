@@ -20,8 +20,8 @@ TO DO:
 v-add-web-domain                  OK
 v-add-web-domain-alias            OK
 v-add-web-domain-proxy            OK
-v-add-web-domain-ssl
-v-add-web-domain-stats
+v-add-web-domain-ssl              OK
+v-add-web-domain-stats            OK
 v-add-dns-domain                  OK
 v-add-dns-on-web-alias            OK
 v-add-domain                      OK -> IPV6 validation?
@@ -50,4 +50,8 @@ v-list-web-templates-proxy        OK
 v-list-sys-ip                     OK
 v-list-user-ips                   OK
 v-list-web-domains                OK
+v-rebuild-dns-domain
+v-rebuild-dns-domains
+v-rebuild-user
+v-rebuild-web-domains
 v-update-sys-vesta

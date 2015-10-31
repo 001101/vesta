@@ -51,15 +51,7 @@ is_package_full 'WEB_ALIASES'
 # Parsing domain values
 get_domain_values 'web'
 
-if [ "$IPV4" == "yes" ] && [ "$IPV6" == "no" ] ; then
-  tpl_sufix=""
-elif [ "$IPV4" == "no" ] && [ "$IPV6" == "yes" ] ; then
-  tpl_sufix="IPV6"
-else
-  tpl_sufix="IP46"
-fi
-
-tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL$tpl_sufix.tpl"
+tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.tpl"
 conf="$HOMEDIR/$user/conf/web/$WEB_SYSTEM.conf"
 if [ "$IPV4" == "yes" ] ; then
   ip=$(get_real_ip $IP)
@@ -83,7 +75,7 @@ del_web_config
 add_web_config
 
 if [ "$SSL" = 'yes' ]; then
-    tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL$tpl_sufix.stpl"
+    tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.stpl"
     conf="$HOMEDIR/$user/conf/web/s$WEB_SYSTEM.conf"
     del_web_config
     add_web_config
@@ -91,13 +83,13 @@ fi
 
 # Checking proxy
 if [ ! -z "$PROXY_SYSTEM" ] && [ ! -z "$PROXY" ]; then
-    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY$tpl_sufix.tpl"
+    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.tpl"
     conf="$HOMEDIR/$user/conf/web/$PROXY_SYSTEM.conf"
     del_web_config
     add_web_config
 
     if [ "$SSL" = 'yes' ]; then
-        tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY$tpl_sufix.stpl"
+        tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.stpl"
         conf="$HOMEDIR/$user/conf/web/s$PROXY_SYSTEM.conf"
         del_web_config
         add_web_config

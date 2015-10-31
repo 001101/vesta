@@ -44,6 +44,7 @@ is_dns_template_valid
 
 # Defining variables
 ip=$(get_object_value 'dns' 'DOMAIN' "$domain" '$IP')
+ipv6=$(get_object_value 'dns' 'DOMAIN' "$domain" '$IP6')
 
 i=1
 ns=$(get_user_value '$NS')
@@ -55,6 +56,7 @@ done
 # Changing tpl
 cat $DNSTPL/$template.tpl |\
     sed -e "s/%ip%/$ip/g" \
+        -e "s/%ipv6%/$ipv6/g" \
         -e "s/%domain_idn%/$domain_idn/g" \
         -e "s/%domain%/$domain/g" \
         -e "s/%ns1%/$ns1/g" \

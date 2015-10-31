@@ -46,29 +46,33 @@ get_domain_values 'web'
 ipv6=$(get_real_ipv6 $ipv6)
 tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.tpl"
 conf="$HOMEDIR/$user/conf/web/$WEB_SYSTEM.conf"
-old=$(get_real_ipv6 $IP6)
+old=''
 new=$ipv6
-replace_web_config
+if [ -z "$IP6" ]; then
+    sed -i "s/DOMAIN='$DOMAIN' IP=/DOMAIN='$DOMAIN' IP6='$ipv6' IP=/g" $USER_DATA/web.conf
+else
+  replace_web_config
 
-# Checking SSL
-if [ "$SSL" = 'yes' ]; then
-    tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.stpl"
-    conf="$HOMEDIR/$user/conf/web/s$WEB_SYSTEM.conf"
-    replace_web_config
-fi
+  # Checking SSL
+  if [ "$SSL" = 'yes' ]; then
+      tpl_file="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$TPL.stpl"
+      conf="$HOMEDIR/$user/conf/web/s$WEB_SYSTEM.conf"
+      replace_web_config
+  fi
 
-# Checking proxy
-if [ ! -z "$PROXY" ]; then
-    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.tpl"
-    conf="$HOMEDIR/$user/conf/web/$PROXY_SYSTEM.conf"
-    replace_web_config
-fi
+  # Checking proxy
+  if [ ! -z "$PROXY" ]; then
+      tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.tpl"
+      conf="$HOMEDIR/$user/conf/web/$PROXY_SYSTEM.conf"
+      replace_web_config
+  fi
 
-# Checking SSL proxy
-if [ "$SSL" = 'yes' ] && [ ! -z "$PROXY" ]; then 
-    tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.stpl"
-    conf="$HOMEDIR/$user/conf/web/s$PROXY_SYSTEM.conf"
-    replace_web_config
+  # Checking SSL proxy
+  if [ "$SSL" = 'yes' ] && [ ! -z "$PROXY" ]; then 
+      tpl_file="$WEBTPL/$PROXY_SYSTEM/$PROXY.stpl"
+      conf="$HOMEDIR/$user/conf/web/s$PROXY_SYSTEM.conf"
+      replace_web_config
+  fi
 fi
 
 
@@ -78,7 +82,9 @@ fi
 
 # Update counters
 increase_ipv6_value "$new"
-decrease_ipv6_value "$old"
+if [ ! -z "$old" ]; then
+  decrease_ipv6_value "$old"
+fi
 
 # Update config
 update_object_value 'web' 'DOMAIN' "$domain" '$IP6' "$3"

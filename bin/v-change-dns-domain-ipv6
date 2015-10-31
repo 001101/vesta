@@ -41,28 +41,32 @@ is_object_unsuspended 'dns' 'DOMAIN' "$domain"
 
 # Get old ip
 get_domain_values 'dns'
-old=$IP6
+if [ -z "$IP6" ]; then
+    sed -i "s/DOMAIN='$DOMAIN' IP=/DOMAIN='$DOMAIN' IP6='$ipv6' IP=/g" $USER_DATA/dns.conf
+else
+  old=$IP6
 
-# Changing ip
-update_object_value 'dns' 'DOMAIN' "$domain" '$IP6' "$ipv6"
+  # Changing ip
+  update_object_value 'dns' 'DOMAIN' "$domain" '$IP6' "$ipv6"
 
-# Changing records
-sed -i "s/$old/$ipv6/g" $USER_DATA/dns/$domain.conf
+  # Changing records
+  sed -i "s/$old/$ipv6/g" $USER_DATA/dns/$domain.conf
 
-# Updating zone
-if [[ "$DNS_SYSTEM" =~ named|bind ]]; then
-    update_domain_serial
-    update_domain_zone
-fi
+  # Updating zone
+  if [[ "$DNS_SYSTEM" =~ named|bind ]]; then
+      update_domain_serial
+      update_domain_zone
+  fi
 
-# Updating dns-cluster queue
-if [ ! -z "$DNS_CLUSTER" ]; then
-    # Check for first sync
-    dlock=$(grep "domain $user $domain" $VESTA/data/queue/dns-cluster.pipe)
-    if [ -z "$dlock" ]; then
-        cmd="$BIN/v-add-remote-dns-domain $user $domain domain yes"
-        echo "$cmd" >> $VESTA/data/queue/dns-cluster.pipe
-    fi
+  # Updating dns-cluster queue
+  if [ ! -z "$DNS_CLUSTER" ]; then
+      # Check for first sync
+      dlock=$(grep "domain $user $domain" $VESTA/data/queue/dns-cluster.pipe)
+      if [ -z "$dlock" ]; then
+          cmd="$BIN/v-add-remote-dns-domain $user $domain domain yes"
+          echo "$cmd" >> $VESTA/data/queue/dns-cluster.pipe
+      fi
+  fi
 fi
 
 

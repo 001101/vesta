@@ -94,9 +94,11 @@ foreach ($sys_arr as $key => $value) {
 }
 if(!isset($_SESSION['IPV4'])) {
   exec (VESTA_CMD."v-change-sys-config-value IPV4 'yes'", $output, $return_var);
+  $_SESSION['IPV4'] = 'yes';
 }
 if(!isset($_SESSION['IPV6'])) {
   exec (VESTA_CMD."v-change-sys-config-value IPV6 'no'", $output, $return_var);
+  $_SESSION['IPV6'] = 'no';
 }
 
 // Set default language

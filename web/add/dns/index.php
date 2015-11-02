@@ -18,8 +18,8 @@ if (!empty($_POST['ok'])) {
 
     // Check empty fields
     if (empty($_POST['v_domain'])) $errors[] = __('domain');
-    if (empty($_POST['v_ip'])) $errors[] = __('ip');
-    if (empty($_POST['v_ipv6'])) $errors[] = __('ipv6');
+    if (empty($_POST['v_ip']) && $_SESSION['IPV4'] == 'yes') $errors[] = __('ip');
+    if (empty($_POST['v_ipv6']) && $_SESSION['IPV6'] == 'yes') $errors[] = __('ipv6');
     if (!empty($errors[0])) {
         foreach ($errors as $i => $error) {
             if ( $i == 0 ) {

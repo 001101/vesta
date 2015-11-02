@@ -58,7 +58,7 @@ fi
 
 # Deleting domain
 del_web_config
-echo "3"
+
 # Checking aliases
 if [ ! -z "$ALIAS" ]; then
     aliases=$(echo $ALIAS | tr ',' '\n' | wc -l )

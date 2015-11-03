@@ -1,17 +1,8 @@
 bin/v-add-sys-ipv6
+  - IPV6ADDR_SECONDARIES
+  - mod_extract_forwarded
+  - mod_rpaf
 bin/v-delete-sys-ipv6
-func/ipv6.sh
-func/main.sh
-  - validate_format_ipall()
-  - validate_format_ipv6()
-web/add/dns/index.php
-web/edit/dns/index.php
-web/templates/admin/add_dns.html
-
-
-
-__('IPV6 address')
-__('Version')
-__('IP address')
-__('IPV4')
-__('IPV6')
+  - Deleting startup conf on RHEL/CentOS/Fedora
+bin/v-delete-sys-ip
+  - Deleting startup conf on RHEL/CentOS/Fedora

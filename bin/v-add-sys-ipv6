@@ -58,7 +58,7 @@ U_SYS_USERS=''
 U_WEB_DOMAINS='0'
 INTERFACE='$interface'
 NETMASK='$netmaskv6'
-NAT='$ipv6'
+NAT=''
 TIME='$TIME'
 DATE='$DATE'
 VERSION='6'" > $VESTA/data/ips/$ipv6
@@ -68,31 +68,30 @@ chmod 660 $VESTA/data/ips/$ipv6
 cidr=$netmaskv6
 
 sys_ip_check=$(/sbin/ip -6 addr | grep "$ipv6")
-#if [ -z "$sys_ip_check" ]; then
+if [ -z "$sys_ip_check" ]; then
     # Adding sys ip
-#    /sbin/ip -6 addr add $ipv6/$cidr dev $interface
+    /sbin/ip -6 addr add $ipv6/$cidr dev $interface
 
     # Adding RHEL/CentOS/Fedora startup script
-#    if [ -e "/etc/redhat-release" ]; then
-#        sys_ip="# Added by vesta"
-#        sys_ip="$sys_ip\nDEVICE=$iface"
-#        sys_ip="$sys_ip\nBOOTPROTO=static"
-#        sys_ip="$sys_ip\nONBOOT=yes"
-#        sys_ip="$sys_ip\nIPADDR=$ip"
-#        sys_ip="$sys_ip\nNETMASK=$netmask"
-#        echo -e $sys_ip > /etc/sysconfig/network-scripts/ifcfg-$iface
-#    fi
+    if [ -e "/etc/redhat-release" ]; then
+        sys_ip="# Added by vesta"
+        sys_ip="$sys_ip\nIPV6INIT=yes"
+        sys_ip="$sys_ip\nIPV6ADDR=$ipv6/$netmaskv6"
+        sys_ip="$sys_ip\nIPV6_DEFAULTGW=$interface"
+        sys_ip="$sys_ip\nIPV6_AUTOCONF=no"
+####### sys_ip="$sys_ip\nIPV6ADDR_SECONDARIES="""
+        echo -e $sys_ip > /etc/sysconfig/network-scripts/ifcfg-$interface
+    fi
 
     # Adding Debian/Ubuntu startup script
-#    if [ -e "/etc/debian_version" ]; then
-#        sys_ip="\n# Added by vesta"
-#        sys_ip="$sys_ip\nauto $iface"
-#        sys_ip="$sys_ip\niface $iface inet static"
-#        sys_ip="$sys_ip\naddress $ip"
-#        sys_ip="$sys_ip\nnetmask $netmask"
-#        echo -e $sys_ip >> /etc/network/interfaces
-#    fi
-#fi
+    if [ -e "/etc/debian_version" ]; then
+        sys_ip="\n# Added by vesta"
+        sys_ip="$sys_ip\niface $interface inet6 static"
+        sys_ip="$sys_ip\naddress $ipv6"
+        sys_ip="$sys_ip\nnetmask $netmaskv6"
+        echo -e $sys_ip >> /etc/network/interfaces
+    fi
+fi
 
 # WEB support
 if [ ! -z "$WEB_SYSTEM" ]; then
@@ -130,12 +129,12 @@ if [ ! -z "$PROXY_SYSTEM" ]; then
 #    fi
 
     # mod_rpaf
-#    rpaf_conf="/etc/$WEB_SYSTEM/mods-enabled/rpaf.conf"
-#    if [ -e "$rpaf_conf" ]; then
-#        rpaf_str=$(grep RPAFproxy_ips $rpaf_conf)
-#        rpaf_str="$rpaf_str $ipv6"
-#        sed -i "s/.*RPAFproxy_ips.*/$rpaf_str/" $rpaf_conf
-#    fi
+    rpaf_conf="/etc/$WEB_SYSTEM/mods-enabled/rpaf.conf"
+    if [ -e "$rpaf_conf" ]; then
+        rpaf_str=$(grep RPAFproxy_ips $rpaf_conf)
+        rpaf_str="$rpaf_str $ipv6"
+        sed -i "s/.*RPAFproxy_ips.*/$rpaf_str/" $rpaf_conf
+    fi
 fi
 
 

@@ -640,13 +640,33 @@ validate_format_ipall() {
     if [ "$valid_octets" -lt 4 ] || [ "$valid_cidr" -eq 0 ]; then
         #Check IPV6
         ipv6_valid=""
+        WORD="[0-9A-Fa-f]\{1,4\}"
+        # flat address, no compressed words
+        FLAT="^${WORD}\(:${WORD}\)\{7\}$"
+
+        COMP2="^\(${WORD}:\)\{1,1\}\(:${WORD}\)\{1,6\}$"
+        COMP3="^\(${WORD}:\)\{1,2\}\(:${WORD}\)\{1,5\}$"
+        COMP4="^\(${WORD}:\)\{1,3\}\(:${WORD}\)\{1,4\}$"
+        COMP5="^\(${WORD}:\)\{1,4\}\(:${WORD}\)\{1,3\}$"
+        COMP6="^\(${WORD}:\)\{1,5\}\(:${WORD}\)\{1,2\}$"
+        COMP7="^\(${WORD}:\)\{1,6\}\(:${WORD}\)\{1,1\}$"
+        # trailing :: edge case, includes case of only :: (all 0's)
+        EDGE_TAIL="^\(\(${WORD}:\)\{1,7\}\|:\):$"
+        # leading :: edge case
+        EDGE_LEAD="^:\(:${WORD}\)\{1,7\}$"
+
+        echo $t_ip | grep --silent "\(${FLAT}\)\|\(${COMP2}\)\|\(${COMP3}\)\|\(${COMP4}\)\|\(${COMP5}\)\|\(${COMP6}\)\|\(${COMP7}\)\|\(${EDGE_TAIL}\)\|\(${EDGE_LEAD}\)"
+        if [ $? -ne 0 ]; then
+           ipv6_valid="INVALID"
+        fi
+
         if [ ! -z "$(echo $1|grep '/')" ]; then
-          if [[ "$t_cidr" -lt 0 ]] || [[ "$t_cidr" -gt 32 ]]; then
-            valid_cidr=0
-          fi
-          if ! [[ "$t_cidr" =~ ^[0-9]+$ ]]; then
-            valid_cidr=0
-          fi
+            if [[ "$t_cidr" -lt 0 ]] || [[ "$t_cidr" -gt 128 ]]; then
+                valid_cidr=0
+            fi
+            if ! [[ "$t_cidr" =~ ^[0-9]+$ ]]; then
+                valid_cidr=0
+            fi
         fi
         
         if [ ! -z "$ipv6_valid" ] || [ "$valid_cidr" -eq 0 ]; then
@@ -661,8 +681,29 @@ validate_format_ipall() {
 validate_format_ipv6() {
     t_ip=$(echo $1 |awk -F / '{print $1}')
     t_cidr=$(echo $1 |awk -F / '{print $2}')
-    valid_octets=0
     valid_cidr=1
+    
+    WORD="[0-9A-Fa-f]\{1,4\}"
+    # flat address, no compressed words
+    FLAT="^${WORD}\(:${WORD}\)\{7\}$"
+    
+    COMP2="^\(${WORD}:\)\{1,1\}\(:${WORD}\)\{1,6\}$"
+    COMP3="^\(${WORD}:\)\{1,2\}\(:${WORD}\)\{1,5\}$"
+    COMP4="^\(${WORD}:\)\{1,3\}\(:${WORD}\)\{1,4\}$"
+    COMP5="^\(${WORD}:\)\{1,4\}\(:${WORD}\)\{1,3\}$"
+    COMP6="^\(${WORD}:\)\{1,5\}\(:${WORD}\)\{1,2\}$"
+    COMP7="^\(${WORD}:\)\{1,6\}\(:${WORD}\)\{1,1\}$"
+    # trailing :: edge case, includes case of only :: (all 0's)
+    EDGE_TAIL="^\(\(${WORD}:\)\{1,7\}\|:\):$"
+    # leading :: edge case
+    EDGE_LEAD="^:\(:${WORD}\)\{1,7\}$"
+   
+    echo $t_ip | grep --silent "\(${FLAT}\)\|\(${COMP2}\)\|\(${COMP3}\)\|\(${COMP4}\)\|\(${COMP5}\)\|\(${COMP6}\)\|\(${COMP7}\)\|\(${EDGE_TAIL}\)\|\(${EDGE_LEAD}\)"
+    if [ $? -ne 0 ]; then
+        echo "Error: ip $1 is not valid"
+        log_event "$E_INVALID" "$EVENT"
+        exit $E_INVALID
+    fi
     
     if [ ! -z "$(echo $1|grep '/')" ]; then
         if [[ "$t_cidr" -lt 0 ]] || [[ "$t_cidr" -gt 128 ]]; then

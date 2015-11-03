@@ -48,14 +48,14 @@ cidr=$NETMASK
 #fi
 
 # Deleting system ip
-#if [ ! -z "$interface" ]; then
-#    /sbin/ip addr del $ipv6/$cidr dev $INTERFACE
-#    if [ "$?" -ne 0 ]; then
-#        echo "Error: can't delete system ip"
-#        log_event "$E_FORBIDEN" "$EVENT"
-#        exit $E_FORBIDEN
-#    fi
-#fi
+if [ ! -z "$interface" ]; then
+    /sbin/ip -6 addr del $ipv6/$cidr dev $INTERFACE
+    if [ "$?" -ne 0 ]; then
+        echo "Error: can't delete system ip"
+        log_event "$E_FORBIDEN" "$EVENT"
+        exit $E_FORBIDEN
+    fi
+fi
 
 # Deleting startup conf on RHEL/CentOS/Fedora
 #if [ -e "/etc/sysconfig/network-scripts/ifcfg-$interface" ]; then
@@ -63,14 +63,14 @@ cidr=$NETMASK
 #fi
 
 # Deleting startup conf on Debian/Ubuntu
-#if [ -e "/etc/network/interfaces" ]; then
-#    ip_str=$(grep -n $ipv6$ /etc/network/interfaces |cut -f1 -d:)
-#    if [ ! -z "$ip_str" ]; then
-#        first_str=$((ip_str - 3))
-#        last_str=$((ip_str + 1))
-#        sed -i "$first_str,$last_str d" /etc/network/interfaces
-#    fi
-#fi
+if [ -e "/etc/network/interfaces" ]; then
+    ip_str=$(grep -n $ipv6$ /etc/network/interfaces |cut -f1 -d:)
+    if [ ! -z "$ip_str" ]; then
+        first_str=$((ip_str - 2))
+        last_str=$((ip_str + 1))
+        sed -i "$first_str,$last_str d" /etc/network/interfaces
+    fi
+fi
 
 # Deleting vesta ip
 rm -f $VESTA/data/ips/$ipv6
@@ -93,12 +93,12 @@ if [ ! -z "$PROXY_SYSTEM" ]; then
 #    fi
 
     # mod_rpaf
-#    rpaf_conf="/etc/$WEB_SYSTEM/mods-enabled/rpaf.conf"
-#    if [ -e "$rpaf_conf" ]; then
-#        ips=$(grep RPAFproxy_ips $rpaf_conf)
-#        new_ips=$(echo "$rpaf_str" | sed "s/$ipv6//")
-#        sed -i "s/$ips/$new_ips/g" $rpaf_conf
-#    fi
+    rpaf_conf="/etc/$WEB_SYSTEM/mods-enabled/rpaf.conf"
+    if [ -e "$rpaf_conf" ]; then
+        ips=$(grep RPAFproxy_ips $rpaf_conf)
+        new_ips=$(echo "$rpaf_str" | sed "s/$ipv6//")
+        sed -i "s/$ips/$new_ips/g" $rpaf_conf
+    fi
 fi
 
 

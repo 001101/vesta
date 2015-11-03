@@ -6,3 +6,7 @@ bin/v-delete-sys-ipv6
   - Deleting startup conf on RHEL/CentOS/Fedora
 bin/v-delete-sys-ip
   - Deleting startup conf on RHEL/CentOS/Fedora
+  
+  
+  
+  v-update-sys-ip

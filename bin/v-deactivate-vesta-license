@@ -1,23 +1,20 @@
 #!/bin/bash
-# info: delete firewall blocking rule
-# options: IP CHAIN
+# info: deactivate vesta license
+# options: MODULE LICENSE
 #
-# The function deletes blocking rule from system firewall
+# The function activates and register vesta license
 
 
 #----------------------------------------------------------#
 #                    Variable&Function                     #
 #----------------------------------------------------------#
 
-# Importing system variables
-source /etc/profile
-
 # Argument defenition
-ip=$1
-chain=$(echo $2|tr '[:lower:]' '[:upper:]')
+module=$(echo $1 | tr '[:lower:]' '[:upper:]')
+license=$2
 
-# Defining absolute path for iptables and modprobe
-iptables="/sbin/iptables"
+# Importing system enviroment
+source /etc/profile
 
 # Includes
 source $VESTA/func/main.sh
@@ -28,35 +25,39 @@ source $VESTA/conf/vesta.conf
 #                    Verifications                         #
 #----------------------------------------------------------#
 
-check_args '2' "$#" 'IP CHAIN'
-validate_format 'ip' 'chain'
-is_system_enabled "$FIREWALL_SYSTEM" 'FIREWALL_SYSTEM'
+# Checking arg number
+check_args '2' "$#" 'MODULE LICENSE'
 
 
 #----------------------------------------------------------#
 #                       Action                             #
 #----------------------------------------------------------#
 
-# Checking ip in banlist
-conf="$VESTA/data/firewall/banlist.conf"
-check_ip=$(grep "IP='$ip' CHAIN='$chain'" $conf 2>/dev/null)
-if [ -z "$check_ip" ]; then
-    exit
+# Activating license
+v_host='https://vestacp.com/checkout'
+answer=$(curl -s $v_host/cancel.php?licence_key=$license)
+check_result $? "cant' connect to vestacp.com " $E_CONNECT
+
+# Checking server answer
+if [[ "$answer" != '0' ]]; then
+    echo "Error: $module license $license is invalid"
+    exit $E_INVALID
 fi
-
-# Deleting ip from banlist
-sip=$(echo "$ip"| sed "s|/|\\\/|g")
-sed -i "/IP='$sip' CHAIN='$chain'/d" $conf
-b=$($iptables -L fail2ban-$chain --line-number -n|grep $ip|awk '{print $1}')
-$iptables -D fail2ban-$chain $b 2>/dev/null
-
-# Changing permissions
-chmod 660 $conf
 
 
 #----------------------------------------------------------#
 #                       Vesta                              #
 #----------------------------------------------------------#
+
+# Updating vesta.conf
+if [ ! -z "$(grep "${module}_KEY" $VESTA/conf/vesta.conf)" ]; then
+    sed -i "s/${module}_KEY=.*/${module}_KEY=''/g" $VESTA/conf/vesta.conf
+fi
+
+# Deactivating sftpjail
+if [ "$module" = 'SFTPJAIL' ]; then
+    setsid $BIN/v-delete-sys-sftp-jail 2>/dev/null
+fi
 
 # Logging
 log_event "$OK" "$EVENT"

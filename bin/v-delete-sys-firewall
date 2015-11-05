@@ -1,23 +1,13 @@
 #!/bin/bash
-# info: delete firewall blocking rule
-# options: IP CHAIN
+# info: delete system firewall
+# opions: NONE
 #
-# The function deletes blocking rule from system firewall
+# The script disables firewall support
 
 
 #----------------------------------------------------------#
 #                    Variable&Function                     #
 #----------------------------------------------------------#
-
-# Importing system variables
-source /etc/profile
-
-# Argument defenition
-ip=$1
-chain=$(echo $2|tr '[:lower:]' '[:upper:]')
-
-# Defining absolute path for iptables and modprobe
-iptables="/sbin/iptables"
 
 # Includes
 source $VESTA/func/main.sh
@@ -28,30 +18,24 @@ source $VESTA/conf/vesta.conf
 #                    Verifications                         #
 #----------------------------------------------------------#
 
-check_args '2' "$#" 'IP CHAIN'
-validate_format 'ip' 'chain'
-is_system_enabled "$FIREWALL_SYSTEM" 'FIREWALL_SYSTEM'
+if [ -z "$FIREWALL_SYSTEM" ]; then
+    exit
+fi
 
 
 #----------------------------------------------------------#
 #                       Action                             #
 #----------------------------------------------------------#
 
-# Checking ip in banlist
-conf="$VESTA/data/firewall/banlist.conf"
-check_ip=$(grep "IP='$ip' CHAIN='$chain'" $conf 2>/dev/null)
-if [ -z "$check_ip" ]; then
-    exit
+# Stopping firewall
+$BIN/v-stop-firewall
+
+# Updating FIREWALL_SYSTEM value
+if [ -z "$(grep FIREWALL_SYSTEM $VESTA/conf/vesta.conf)" ]; then
+    echo "FIREWALL_SYSTEM=''" >> $VESTA/conf/vesta.conf
+else
+    sed -i "s/FIREWALL_SYSTEM=.*/FIREWALL_SYSTEM=''/g" $VESTA/conf/vesta.conf
 fi
-
-# Deleting ip from banlist
-sip=$(echo "$ip"| sed "s|/|\\\/|g")
-sed -i "/IP='$sip' CHAIN='$chain'/d" $conf
-b=$($iptables -L fail2ban-$chain --line-number -n|grep $ip|awk '{print $1}')
-$iptables -D fail2ban-$chain $b 2>/dev/null
-
-# Changing permissions
-chmod 660 $conf
 
 
 #----------------------------------------------------------#

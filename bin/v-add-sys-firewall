@@ -1,23 +1,13 @@
 #!/bin/bash
-# info: delete firewall blocking rule
-# options: IP CHAIN
+# info: add system firewall
+# opions: NONE
 #
-# The function deletes blocking rule from system firewall
+# The script enables firewall
 
 
 #----------------------------------------------------------#
 #                    Variable&Function                     #
 #----------------------------------------------------------#
-
-# Importing system variables
-source /etc/profile
-
-# Argument defenition
-ip=$1
-chain=$(echo $2|tr '[:lower:]' '[:upper:]')
-
-# Defining absolute path for iptables and modprobe
-iptables="/sbin/iptables"
 
 # Includes
 source $VESTA/func/main.sh
@@ -28,30 +18,33 @@ source $VESTA/conf/vesta.conf
 #                    Verifications                         #
 #----------------------------------------------------------#
 
-check_args '2' "$#" 'IP CHAIN'
-validate_format 'ip' 'chain'
-is_system_enabled "$FIREWALL_SYSTEM" 'FIREWALL_SYSTEM'
+if [ "$FIREWALL_SYSTEM" = 'iptables' ]; then
+    exit
+fi
 
 
 #----------------------------------------------------------#
 #                       Action                             #
 #----------------------------------------------------------#
 
-# Checking ip in banlist
-conf="$VESTA/data/firewall/banlist.conf"
-check_ip=$(grep "IP='$ip' CHAIN='$chain'" $conf 2>/dev/null)
-if [ -z "$check_ip" ]; then
-    exit
+# Adding firewall directory
+mkdir -p $VESTA/data/firewall/
+
+# Adding default ruleset
+if [ ! -e "$VESTA/data/firewall/rules.conf" ]; then
+    cp $VESTA/install/rhel/7/* $VESTA/data/firewall/
 fi
 
-# Deleting ip from banlist
-sip=$(echo "$ip"| sed "s|/|\\\/|g")
-sed -i "/IP='$sip' CHAIN='$chain'/d" $conf
-b=$($iptables -L fail2ban-$chain --line-number -n|grep $ip|awk '{print $1}')
-$iptables -D fail2ban-$chain $b 2>/dev/null
+# Updating FIREWAL_SYSTEM value
+if [ -z "$(grep FIREWALL_SYSTEM $VESTA/conf/vesta.conf)" ]; then
+    echo "FIREWALL_SYSTEM='iptables'" >> $VESTA/conf/vesta.conf
+else
+    sed -i "s/FIREWALL_SYSTEM.*/FIREWALL_SYSTEM='iptables'/g" \
+        $VESTA/conf/vesta.conf
+fi
 
-# Changing permissions
-chmod 660 $conf
+# Updating firewall rules
+$BIN/v-update-firewall
 
 
 #----------------------------------------------------------#

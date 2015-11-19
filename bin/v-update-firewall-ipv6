@@ -10,7 +10,7 @@
 #----------------------------------------------------------#
 
 # Defining absolute path for iptables and modprobe
-iptables="/sbin/iptables"
+iptables="/sbin/ip6tables"
 modprobe="/sbin/modprobe"
 sysctl="/sbin/sysctl"
 
@@ -31,9 +31,9 @@ is_system_enabled "$FIREWALL_SYSTEM" 'FIREWALL_SYSTEM'
 #                       Action                             #
 #----------------------------------------------------------#
 
-# Checking local IPv4 rules
-rules="$VESTA/data/firewall/rules.conf"
-ports="$VESTA/data/firewall/ports.conf"
+# Checking local IPv6 rules
+rules="$VESTA/data/firewallv6/rules.conf"
+ports="$VESTA/data/firewallv6/ports.conf"
 
 if [ ! -e "$rules" ]; then
     exit
@@ -103,11 +103,11 @@ done
 # Handling local traffic
 for ip in $(ls $VESTA/data/ips); do
     source $VESTA/data/ips/$ip
-    if [ "4" = "$VERSION"]; then
+    if [ "6" = "$VERSION"]; then
       echo "$iptables -A INPUT -s $ip -j ACCEPT" >> $tmp
     fi
 done
-echo "$iptables -A INPUT -s 127.0.0.1 -j ACCEPT" >> $tmp
+echo "$iptables -A INPUT -s ::1 -j ACCEPT" >> $tmp
 IFS=$'\n'
 for p_rule in $(cat $ports); do
     eval $p_rule
@@ -135,13 +135,13 @@ bash $tmp 2>/dev/null
 rm -f $tmp
 
 # Checking custom trigger
-if [ -x "$VESTA/data/firewall/custom.sh" ]; then
-    bash $VESTA/data/firewall/custom.sh
+if [ -x "$VESTA/data/firewallv6/custom.sh" ]; then
+    bash $VESTA/data/firewallv6/custom.sh
 fi
 
 # Checking fail2ban support
 if [ ! -z "$FIREWALL_EXTENSION" ]; then
-    for chain in $(cat $VESTA/data/firewall/chains.conf 2>/dev/null); do
+    for chain in $(cat $VESTA/data/firewallv6/chains.conf 2>/dev/null); do
         eval $chain
         if [[ "$PORT" =~ ,|-|: ]] ; then
             port="-m multiport --dports $PORT"
@@ -150,13 +150,13 @@ if [ ! -z "$FIREWALL_EXTENSION" ]; then
         fi
         echo "$iptables -N fail2ban-$CHAIN" >> $tmp
         echo "$iptables -F fail2ban-$CHAIN" >> $tmp
-        echo "$iptables -I fail2ban-$CHAIN -s 0.0.0.0/0 -j RETURN" >> $tmp
+        echo "$iptables -I fail2ban-$CHAIN -s ::/0 -j RETURN" >> $tmp
         echo "$iptables -I INPUT -p $PROTOCOL $port -j fail2ban-$CHAIN" >>$tmp
     done
     bash $tmp 2>/dev/null
     rm -f $tmp
 
-    for ban in $(cat $VESTA/data/firewall/banlist.conf 2>/dev/null); do
+    for ban in $(cat $VESTA/data/firewallv6/banlist.conf 2>/dev/null); do
         eval $ban
         echo -n "$iptables -I fail2ban-$CHAIN 1 -s $IP" >> $tmp
         echo " -j REJECT --reject-with icmp-port-unreachable" >> $tmp
@@ -167,16 +167,16 @@ fi
 
 # Saving rules to the master iptables file
 if [ -e "/etc/redhat-release" ]; then
-    /sbin/iptables-save > /etc/sysconfig/iptables
-    if [ -z "$(ls /etc/rc3.d/S*iptables 2>/dev/null)" ]; then
-        /sbin/chkconfig iptables on
+    /sbin/ip6tables-save > /etc/sysconfig/ip6tables
+    if [ -z "$(ls /etc/rc3.d/S*ip6tables 2>/dev/null)" ]; then
+        /sbin/chkconfig ip6tables on
     fi
 else
-    /sbin/iptables-save > /etc/iptables.rules
-    preup="/etc/network/if-pre-up.d/iptables"
+    /sbin/ip6tables-save > /etc/ip6tables.rules
+    preup="/etc/network/if-pre-up.d/ip6tables"
     if [ ! -e "$preup" ]; then
         echo '#!/bin/sh' > $preup
-        echo "/sbin/iptables-restore < /etc/iptables.rules" >> $preup
+        echo "/sbin/ip6tables-restore < /etc/ip6tables.rules" >> $preup
         echo "exit 0" >> $preup
         chmod +x $preup
     fi

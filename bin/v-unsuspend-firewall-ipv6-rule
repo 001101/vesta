@@ -36,7 +36,7 @@ is_object_suspended '../../data/firewallv6/rules' 'RULE' "$rule"
 update_object_value ../../data/firewallv6/rules RULE $rule '$SUSPENDED' no
 
 # Updating system firewall
-$BIN/v-update-firewall
+$BIN/v-update-firewall-ipv6
 
 
 #----------------------------------------------------------#

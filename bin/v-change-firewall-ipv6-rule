@@ -67,7 +67,7 @@ echo "$str" >> $VESTA/data/firewallv6/rules.conf
 sort_fw_rules
 
 # Updating system firewall
-$BIN/v-update-firewall
+$BIN/v-update-firewall-ipv6
 
 
 #----------------------------------------------------------#

@@ -67,6 +67,22 @@ chmod 660 $VESTA/data/ips/$ipv6
 
 cidr=$netmaskv6
 
+#enable ipv6
+#ipConf=$(cat /etc/sysctl.conf | grep "net.ipv6.conf.all.disable_ipv6")
+#if [ -z "$ipConf" ]; then
+#  echo "net.ipv6.conf.all.disable_ipv6 = 0" >> /etc/sysctl.conf
+#  echo "net.ipv6.conf.default.disable_ipv6 = 0" >> /etc/sysctl.conf
+#  echo "net.ipv6.conf.lo.disable_ipv6 = 0" >> /etc/sysctl.conf
+#else
+#  disable_ipv6=$(cat /etc/sysctl.conf | grep "net.ipv6.conf.all.disable_ipv6 = 0")
+#  if [ -n "$disable_ipv6" ]; then
+#    sed -i "s/net.ipv6.conf.all.disable_ipv6 = 1/net.ipv6.conf.all.disable_ipv6 = 0/g" /etc/sysctl.conf
+#    sed -i "s/net.ipv6.conf.default.disable_ipv6 = 1/net.ipv6.conf.default.disable_ipv6 = 0/g" /etc/sysctl.conf
+#    sed -i "s/net.ipv6.conf.lo.disable_ipv6 = 1/net.ipv6.conf.lo.disable_ipv6 = 0/g" /etc/sysctl.conf
+#  fi
+#fi
+#REBOOT
+
 sys_ip_check=$(/sbin/ip -6 addr | grep "$ipv6")
 if [ -z "$sys_ip_check" ]; then
     # Adding sys ip

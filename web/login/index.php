@@ -44,7 +44,7 @@ if (isset($_POST['user']) && isset($_POST['password'])) {
     fclose($fp);
 
     // Check user & password
-    exec(VESTA_CMD ."v-check-user-password ".$v_user." ".$v_password." '".$_SERVER["REMOTE_ADDR"]."'",  $output, $return_var);
+    exec(VESTA_CMD ."v-check-user-password ".$v_user." ".$v_password." ".escapeshellarg($_SERVER['REMOTE_ADDR']),  $output, $return_var);
     unset($output);
 
     // Remove tmp file
@@ -93,8 +93,8 @@ foreach ($sys_arr as $key => $value) {
     $_SESSION[$key] = $value;
 }
 
-// Set default language
-if (empty($_SESSION['language'])) $_SESSION['language']='en';
+// Detect language
+if (empty($_SESSION['language'])) $_SESSION['language'] = detect_user_language();
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/i18n/'.$_SESSION['language'].'.php');
 require_once('../templates/header.html');

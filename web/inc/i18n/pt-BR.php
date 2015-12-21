@@ -4,7 +4,7 @@
  * Diego Hernandes (diego@he.rnand.es)
  */
 
-$LANG['pt'] = array(
+$LANG['pt-BR'] = array(
     'Packages'  => 'Pacotes',
     'IP'  => 'IP',
     'Graphs'  => 'Gráficos',
@@ -121,7 +121,7 @@ $LANG['pt'] = array(
     'Editing Firewall Rule' => 'Editando Regra de Firewall',
     'Adding IP Address to Banlist' => 'Adicionando endereço IP na lista negra',
 
-    'active'  => 'activo',
+    'active'  => 'ativo',
     'spnd'  => 'suspenso',
     'suspended'  => 'suspenso',
     'running'  => 'em execução',
@@ -315,11 +315,6 @@ $LANG['pt'] = array(
     'ip'  => 'ip',
     'ip address'  => 'endereço ip',
     'IP address'  => 'Endereço IP',
-    'ipv6 address'  => 'ipv6 address',
-    'IPV6 address'  => 'IPV6 address',
-    'IPV4' => 'IPv4',
-    'IPV6' => 'IPv6',
-    'Version' => 'Version',
     'netmask'  => 'máscara de rede',
     'interface'  => 'interface',
     'assigned user'  => 'usuário atribuído',

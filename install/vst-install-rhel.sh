@@ -26,7 +26,7 @@ if [ "$release" -eq 7 ]; then
     postgresql postgresql-server postgresql-contrib phpPgAdmin e2fsprogs
     openssh-clients ImageMagick curl mc screen ftp zip unzip flex sqlite pcre
     sudo bc jwhois mailx lsof tar telnet rrdtool net-tools ntp GeoIP freetype
-    fail2ban rsyslog iptables-services which vesta vesta-nginx vesta-php"
+    fail2ban rsyslog iptables-services iptables-ipv6 which vesta vesta-nginx vesta-php git"
 else
     software="nginx httpd mod_ssl mod_ruid2 mod_fcgid mod_extract_forwarded
     php php-common php-cli php-bcmath php-gd php-imap php-mbstring php-mcrypt
@@ -36,7 +36,7 @@ else
     postgresql-server postgresql-contrib phpPgAdmin e2fsprogs openssh-clients
     ImageMagick curl mc screen ftp zip unzip flex sqlite pcre sudo bc jwhois
     mailx lsof tar telnet rrdtool net-tools ntp GeoIP freetype fail2ban
-    which vesta vesta-nginx vesta-php"
+    which vesta vesta-nginx vesta-php git"
 fi
 
 # Defining help function
@@ -61,6 +61,8 @@ help() {
   -q, --quota             Filesystem Quota      [yes|no]  default: no
   -l, --lang              Default language                default: en
   -y, --interactive       Interactive install   [yes|no]  default: yes
+  -4, --ipv4              Enable IPV4           [yes|no]  default: yes
+  -6, --ipv6              Enable IPV6           [yes|no]  default: yes
   -s, --hostname          Set hostname
   -e, --email             Set admin email
   -p, --password          Set admin password
@@ -132,6 +134,8 @@ for arg; do
         --quota)                args="${args}-q " ;;
         --lang)                 args="${args}-l " ;;
         --interactive)          args="${args}-y " ;;
+        --ipv4)                 args="${args}-4 " ;;
+        --ipv6)                 args="${args}-6 " ;;
         --hostname)             args="${args}-s " ;;
         --email)                args="${args}-e " ;;
         --password)             args="${args}-p " ;;
@@ -144,7 +148,7 @@ done
 eval set -- "$args"
 
 # Parsing arguments
-while getopts "a:n:w:v:j:k:m:g:d:x:z:c:t:i:b:r:q:l:y:s:e:p:fh" Option; do
+while getopts "a:n:w:v:j:k:m:g:d:x:z:c:t:i:b:r:q:l:y:4:6:s:e:p:fh" Option; do
     case $Option in
         a) apache=$OPTARG ;;            # Apache
         n) nginx=$OPTARG ;;             # Nginx
@@ -168,6 +172,8 @@ while getopts "a:n:w:v:j:k:m:g:d:x:z:c:t:i:b:r:q:l:y:s:e:p:fh" Option; do
         s) servername=$OPTARG ;;        # Hostname
         e) email=$OPTARG ;;             # Admin email
         p) vpass=$OPTARG ;;             # Admin password
+        4) ipv4=$OPTARG ;;              # IPV4
+        6) ipv6=$OPTARG ;;              # IPV6
         f) force='yes' ;;               # Force install
         h) help ;;                      # Help
         *) help ;;                      # Print help (default)
@@ -199,6 +205,8 @@ set_default_value 'remi' 'yes'
 set_default_value 'quota' 'no'
 set_default_value 'lang' 'en'
 set_default_value 'interactive' 'yes'
+set_default_value 'ipv4' 'yes'
+set_default_value 'ipv6' 'yes'
 
 # Checking software conflicts
 if [ "$phpfpm" = 'yes' ]; then
@@ -348,6 +356,12 @@ if [ "$iptables" = 'yes' ]; then
 fi
 if [ "$iptables" = 'yes' ] && [ "$fail2ban" = 'yes' ]; then
     echo -n ' + Fail2Ban'
+fi
+if [ "$ipv4" = 'yes' ]; then
+    echo '   - IPV4'
+fi
+if [ "$ipv6" = 'yes' ]; then
+    echo '   - IPV6'
 fi
 echo -e "\n\n"
 
@@ -601,6 +615,56 @@ else
 fi
 check_result $? "yum install failed"
 
+#TEST
+cd `dirname $0`
+git clone https://github.com/tjebbeke/vesta.git
+
+echo "Delete BIN"
+rm -rf /usr/local/vesta/bin/*
+echo "Copy files"
+cp -r vesta/bin/* /usr/local/vesta/bin/
+echo "chown files"
+chown -R root:root /usr/local/vesta/bin
+
+echo "DELETE WEB"
+rm -rf /usr/local/vesta/web/*
+echo "Copy files"
+cp -r vesta/web/* /usr/local/vesta/web/
+echo "chown files"
+chown -R root:root /usr/local/vesta/web
+
+echo "DELETE FUNC"
+rm -rf /usr/local/vesta/func/*
+echo "Copy files"
+cp -r vesta/func/* /usr/local/vesta/func/
+echo "chown files"
+chown -R root:root /usr/local/vesta/func
+
+echo "DELETE INSTALL"
+rm -rf /usr/local/vesta/install/*
+echo "Copy files"
+cp -r vesta/install/* /usr/local/vesta/install/
+echo "chown files"
+chown -R root:root /usr/local/vesta/install
+
+
+echo "DELETE upd"
+rm -rf /usr/local/vesta/upd/*
+echo "Copy files"
+cp -r vesta/upd/* /usr/local/vesta/upd/
+echo "chown files"
+chown -R root:root /usr/local/vesta/upd
+
+echo "DELETE TEMP"
+rm -rf /usr/local/vesta/data/templates/*
+echo "Copy files"
+cp -r vesta/install/rhel/6/templates/* /usr/local/vesta/data/templates/
+echo "chown files"
+chown -R root:root /usr/local/vesta/data/templates/
+
+cd $vst_backups
+#TEST
+
 
 #----------------------------------------------------------#
 #                     Configure system                     #
@@ -628,6 +692,7 @@ fi
 
 # Disable iptables
 service iptables stop
+service ip6tables stop
 
 # Configuring NTP synchronization
 echo '#!/bin/sh' > /etc/cron.daily/ntpdate
@@ -677,7 +742,7 @@ wget $vestacp/logrotate/vesta -O /etc/logrotate.d/vesta
 
 # Buidling directory tree and creating some blank files for vesta
 mkdir -p $VESTA/conf $VESTA/log $VESTA/ssl $VESTA/data/ips \
-    $VESTA/data/queue $VESTA/data/users $VESTA/data/firewall
+    $VESTA/data/queue $VESTA/data/users $VESTA/data/firewall $VESTA/data/firewallv6
 touch $VESTA/data/queue/backup.pipe $VESTA/data/queue/disk.pipe \
     $VESTA/data/queue/webstats.pipe $VESTA/data/queue/restart.pipe \
     $VESTA/data/queue/traffic.pipe $VESTA/log/system.log \
@@ -723,8 +788,16 @@ if [ "$apache" = 'no' ] && [ "$nginx"  = 'yes' ]; then
     fi
     echo "STATS_SYSTEM='webalizer,awstats'" >> $VESTA/conf/vesta.conf
 fi
-echo "IPV4='yes'" >> $VESTA/conf/vesta.conf
-echo "IPV6='no'" >> $VESTA/conf/vesta.conf
+if [ $ipv4 = 'yes' ]; then
+  echo "IPV4='yes'" >> $VESTA/conf/vesta.conf
+else
+  echo "IPV4='no'" >> $VESTA/conf/vesta.conf
+fi
+if [ $ipv6 = 'yes' ]; then
+  echo "IPV6='yes'" >> $VESTA/conf/vesta.conf
+else
+  echo "IPV6='no'" >> $VESTA/conf/vesta.conf
+fi
 
 # FTP stack
 if [ "$vsftpd" = 'yes' ]; then
@@ -798,6 +871,66 @@ chkconfig firewalld off >/dev/null 2>&1
 wget $vestacp/firewall.tar.gz -O firewall.tar.gz
 tar -xzf firewall.tar.gz
 rm -f firewall.tar.gz
+
+
+# Downloading firewall rules
+chkconfig ip6tables off >/dev/null 2>&1
+wget $vestacp/firewallv6.tar.gz -O firewallv6.tar.gz
+tar -xzf firewallv6.tar.gz
+rm -f firewallv6.tar.gz
+
+
+#TEST
+
+cd `dirname $0`
+git clone https://github.com/tjebbeke/vesta.git
+
+echo "Delete BIN"
+rm -rf /usr/local/vesta/bin/*
+echo "Copy files"
+cp -r vesta/bin/* /usr/local/vesta/bin/
+echo "chown files"
+chown -R root:root /usr/local/vesta/bin
+
+echo "DELETE WEB"
+rm -rf /usr/local/vesta/web/*
+echo "Copy files"
+cp -r vesta/web/* /usr/local/vesta/web/
+echo "chown files"
+chown -R root:root /usr/local/vesta/web
+
+echo "DELETE FUNC"
+rm -rf /usr/local/vesta/func/*
+echo "Copy files"
+cp -r vesta/func/* /usr/local/vesta/func/
+echo "chown files"
+chown -R root:root /usr/local/vesta/func
+
+echo "DELETE INSTALL"
+rm -rf /usr/local/vesta/install/*
+echo "Copy files"
+cp -r vesta/install/* /usr/local/vesta/install/
+echo "chown files"
+chown -R root:root /usr/local/vesta/install
+
+
+echo "DELETE upd"
+rm -rf /usr/local/vesta/upd/*
+echo "Copy files"
+cp -r vesta/upd/* /usr/local/vesta/upd/
+echo "chown files"
+chown -R root:root /usr/local/vesta/upd
+
+echo "DELETE TEMP"
+rm -rf /usr/local/vesta/data/templates/*
+echo "Copy files"
+cp -r vesta/install/rhel/6/templates/* /usr/local/vesta/data/templates/
+echo "chown files"
+chown -R root:root /usr/local/vesta/data/templates/
+
+cd $VESTA/data
+source /etc/profile.d/vesta.sh
+#TEST
 
 # Configuring server hostname
 $VESTA/bin/v-change-sys-hostname $servername 2>/dev/null
@@ -1185,21 +1318,38 @@ $VESTA/bin/v-change-user-language admin $lang
 # Configuring system ips
 $VESTA/bin/v-update-sys-ip
 
-# Get main ip
-ip=$(ip addr|grep 'inet '|grep global|head -n1|awk '{print $2}'|cut -f1 -d/)
-
-# Get public ip
-pub_ip=$(wget vestacp.com/what-is-my-ip/ -O - 2>/dev/null)
-if [ ! -z "$pub_ip" ] && [ "$pub_ip" != "$ip" ]; then
-    $VESTA/bin/v-change-sys-ip-nat $ip $pub_ip
+# Get main ipv6
+if [ "$ipv6" = "yes" ]; then
+  ip=$(ip addr show dev eth0 | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d' | head -n 1)
+  if [ ! -z "$ip" ]; then
+    netmask=$(ip addr show dev eth0 | grep '$ip' | awk -F '/' '{print $2}' | awk '{print $1}')
+    $VESTA/bin/v-add-sys-ipv6 $ip $netmask 
+    ip="[$ip]"
+  fi
 fi
-if [ -z "$pub_ip" ]; then
-    ip=$main_ip
+
+
+# Get main ip
+if [ "$ipv4" = 'yes' ]; then
+  ip=$(ip addr|grep 'inet '|grep global|head -n1|awk '{print $2}'|cut -f1 -d/)
+  # Get public ip
+  pub_ip=$(wget vestacp.com/what-is-my-ip/ -O - 2>/dev/null)
+  if [ ! -z "$pub_ip" ] && [ "$pub_ip" != "$ip" ]; then
+      $VESTA/bin/v-change-sys-ip-nat $ip $pub_ip
+  fi
+  if [ -z "$pub_ip" ]; then
+      ip=$main_ip
+  fi
 fi
 
 # Firewall configuration
 if [ "$iptables" = 'yes' ]; then
+  if [ "$ipv4" = 'yes' ]; then
     $VESTA/bin/v-update-firewall
+  fi
+  if [ "$ipv6" = 'yes' ]; then
+    $VESTA/bin/v-update-firewall-ipv6
+  fi
 fi
 
 # Configuring mysql host

@@ -404,6 +404,9 @@ json_list() {
                 (( ++i))
                 echo -e "\t\"$value\": {"
             else
+                if [ "${field//$/}" = 'TPL' ] || [ "${field//$/}" = 'BACKEND' ] || [ "${field//$/}" = 'PROXY' ]; then
+                    value=$(echo "$value" | cut -f 2 -d / )
+                fi
                 if [ $i -lt $fileds_count ]; then
                     (( ++i))
                     echo -e "\t\t\"${field//$/}\": \"$value\","
@@ -434,6 +437,9 @@ shell_list() {
         eval $line
         for field in $fields; do
             eval value=$field
+            if [ "${field//$/}" = 'TPL' ] || [ "${field//$/}" = 'BACKEND' ] || [ "${field//$/}" = 'PROXY' ]; then
+                value=$(echo "$value" | cut -f 2 -d / )
+            fi
             if [ -z "$value" ]; then
                 value='NULL'
             fi

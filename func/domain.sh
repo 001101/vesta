@@ -73,7 +73,7 @@ is_web_backend_pool_valid(){
 
 # DNS template check
 is_dns_template_valid() {
-    t="$DNSTPL/$template.tpl"
+    t="$DNSTPL/$tpldir/$template.tpl"
     if [ ! -e $t ]; then
         echo "Error: dns template $template not found"
         log_event "$E_NOTEXIST" "$EVENT"

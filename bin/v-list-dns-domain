@@ -39,6 +39,9 @@ json_list_domain() {
         if [ "$i" -eq 1 ]; then
             echo -e "\t\"$value\": {"
         else
+            if [ "${field//$/}" = 'TPL' ]; then
+                value=$(echo "$value" | cut -f 2 -d / )
+            fi
             if [ "$fileds_count" -eq "$i" ]; then
                 echo -e "\t\t\"${field//$/}\": \"$value\""
             else
@@ -67,6 +70,9 @@ shell_list_domain() {
     # Print result line
     for field in $fields; do
         eval key="$field"
+        if [ "${field//$/}" = 'TPL' ]; then
+            key=$(echo "$key" | cut -f 2 -d / )
+        fi
         echo "${field//$/}: $key "
     done
 }

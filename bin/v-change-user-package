@@ -18,6 +18,13 @@ force=$3
 source $VESTA/func/main.sh
 source $VESTA/conf/vesta.conf
 
+tpldir="ipv4ipv6"
+if [ "$IPV4" == 'yes' ] && [ "$IPV6" == 'no' ]; then
+    tpldir="ipv4"
+elif [ "$IPV4" == 'no' ] && [ "$IPV6" == 'yes' ]; then
+    tpldir="ipv6"
+fi
+
 is_package_avalable() {
 
     usr_data=$(cat $USER_DATA/user.conf)
@@ -100,9 +107,9 @@ change_user_package() {
     echo "FNAME='$FNAME'
 LNAME='$LNAME'
 PACKAGE='$package'
-WEB_TEMPLATE='$WEB_TEMPLATE'
-PROXY_TEMPLATE='$PROXY_TEMPLATE'
-DNS_TEMPLATE='$DNS_TEMPLATE'
+WEB_TEMPLATE='$tpldir/$WEB_TEMPLATE'
+PROXY_TEMPLATE='$tpldir/$PROXY_TEMPLATE'
+DNS_TEMPLATE='$tpldir/$DNS_TEMPLATE'
 WEB_DOMAINS='$WEB_DOMAINS'
 WEB_ALIASES='$WEB_ALIASES'
 DNS_DOMAINS='$DNS_DOMAINS'

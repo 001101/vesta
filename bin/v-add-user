@@ -59,11 +59,6 @@ is_package_valid
 # Parsing package data
 pkg_data=$(cat $VESTA/data/packages/$package.pkg |grep -v TIME |grep -v DATE)
 
-pkg_data=$(echo $pkg_data | sed "s|EB_TEMPLATE='|EB_TEMPLATE='$tpldir/|g")
-pkg_data=$(echo $pkg_data | sed "s|ACKEND_TEMPLATE='|ACKEND_TEMPLATE='$tpldir/|g")
-pkg_data=$(echo $pkg_data | sed "s|ROXY_TEMPLATE='|ROXY_TEMPLATE='$tpldir/|g")
-pkg_data=$(echo $pkg_data | sed "s|NS_TEMPLATE='|NS_TEMPLATE='$tpldir/|g")
-
 # Checking shell
 shell_conf=$(echo "$pkg_data" | grep 'SHELL' | cut -f 2 -d \')
 shell=$(grep -w "$shell_conf" /etc/shells |head -n1)
@@ -196,6 +191,11 @@ NOTIFICATIONS='no'
 TIME='$TIME'
 DATE='$DATE'" > $USER_DATA/user.conf
 chmod 660 $USER_DATA/user.conf
+
+sed -i "s|WEB_TEMPLATE='|WEB_TEMPLATE='$tpldir/|g" $USER_DATA/user.conf
+sed -i "s|BACKEND_TEMPLATE='|BACKEND_TEMPLATE='$tpldir/|g" $USER_DATA/user.conf
+sed -i "s|PROXY_TEMPLATE='|PROXY_TEMPLATE='$tpldir/|g" $USER_DATA/user.conf
+sed -i "s|DNS_TEMPLATE='|DNS_TEMPLATE='$tpldir/|g" $USER_DATA/user.conf
 
 # Updating quota
 if [ "$DISK_QUOTA" = 'yes' ]; then

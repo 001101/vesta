@@ -1323,6 +1323,7 @@ if [ "$ipv6" = "yes" ]; then
   ip=$(ip addr show dev eth0 | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d' | head -n 1)
   if [ ! -z "$ip" ]; then
     netmask=$(ip addr show dev eth0 | grep '$ip' | awk -F '/' '{print $2}' | awk '{print $1}')
+    echo "$VESTA/bin/v-add-sys-ipv6 $ip $netmask"
     $VESTA/bin/v-add-sys-ipv6 $ip $netmask 
     ip="[$ip]"
   fi

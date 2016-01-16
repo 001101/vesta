@@ -1,7 +1,7 @@
 # Web template check
 is_web_template_valid() {
-    t="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$template.tpl"
-    s="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$template.stpl"
+    t="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$tpldir/$template.tpl"
+    s="$WEBTPL/$WEB_SYSTEM/$WEB_BACKEND/$tpldir/$template.stpl"
     if [ ! -e $t ] || [ ! -e $s ]; then
         echo "Error: web template $template not found"
         log_event "$E_NOTEXIST" "$EVENT"
@@ -12,8 +12,8 @@ is_web_template_valid() {
 # Proxy template check
 is_proxy_template_valid() {
     proxy=$1
-    t="$WEBTPL/$PROXY_SYSTEM/$proxy.tpl"
-    s="$WEBTPL/$PROXY_SYSTEM/$proxy.stpl"
+    t="$WEBTPL/$PROXY_SYSTEM/$tpldir/$proxy.tpl"
+    s="$WEBTPL/$PROXY_SYSTEM/$tpldir/$proxy.stpl"
     if [ ! -e $t ] || [ ! -e $s ]; then
         echo "Error: proxy template $proxy not found"
         log_event "$E_NOTEXIST" "$EVENT"
@@ -29,7 +29,7 @@ is_web_backend_template_valid() {
         template=$(grep BACKEND_TEMPLATE $USER_DATA/user.conf)
     fi
     if [ -z "$template" ]; then
-        if [ -e "$WEBTPL/$WEB_BACKEND/default.tpl" ]; then
+        if [ -e "$WEBTPL/$WEB_BACKEND/$tpldir/default.tpl" ]; then
             sed -i "s/^WEB_DOMAINS/BACKEND_TEMPLATE='default'\nWEB_DOMAINS/g" \
                 $USER_DATA/user.conf
             template='default'
@@ -40,7 +40,7 @@ is_web_backend_template_valid() {
         fi
     else
         template=$(echo "$template"|cut -f 2 -d \'|head -n1)
-        if [ ! -e "$WEBTPL/$WEB_BACKEND/$template.tpl" ]; then
+        if [ ! -e "$WEBTPL/$WEB_BACKEND/$tpldir/$template.tpl" ]; then
             echo "Error: backend template $template not found"
             log_event "$E_NOTEXIST" "$EVENT"
             exit $E_NOTEXIST

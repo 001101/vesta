@@ -27,6 +27,12 @@ source $VESTA/func/ip.sh
 source $VESTA/func/ipv6.sh
 source $VESTA/conf/vesta.conf
 
+tpldir="ipv4ipv6"
+if [ "$IPV4" == 'yes' ] && [ "$IPV6" == 'no' ]; then
+    tpldir="ipv4"
+elif [ "$IPV4" == 'no' ] && [ "$IPV6" == 'yes' ]; then
+    tpldir="ipv6"
+fi
 
 #----------------------------------------------------------#
 #                    Verifications                         #
@@ -65,9 +71,9 @@ fi
 del_web_config
 
 # Add new vhost
-PROXY="$template"
+PROXY="$tpldir/$template"
 PROXY_EXT="$extentions"
-tpl_file="$WEBTPL/$PROXY_SYSTEM/$template.tpl"
+tpl_file="$WEBTPL/$PROXY_SYSTEM/$tpldir/$template.tpl"
 upd_web_domain_values
 add_web_config
 chown root:$user $conf
@@ -79,15 +85,15 @@ if [ "$SSL" = 'yes' ]; then
     conf="$HOMEDIR/$user/conf/web/s$PROXY_SYSTEM.conf"
     del_web_config
 
-    tpl_file="$WEBTPL/$PROXY_SYSTEM/$template.stpl"
+    tpl_file="$WEBTPL/$PROXY_SYSTEM/$tpldir/$template.stpl"
     add_web_config
     chown root:$user $conf
     chmod 640 $conf
 fi
 
 # Running template trigger
-if [ -x $WEBTPL/$PROXY_SYSTEM/$template.sh ]; then
-    $WEBTPL/$PROXY_SYSTEM/$template.sh $user $domain $ip $ipv6 $HOMEDIR $docroot
+if [ -x $WEBTPL/$PROXY_SYSTEM/$tpldir/$template.sh ]; then
+    $WEBTPL/$PROXY_SYSTEM/$tpldir/$template.sh $user $domain $ip $ipv6 $HOMEDIR $docroot
 fi
 
 

@@ -355,7 +355,7 @@ if [ "$iptables" = 'yes' ]; then
     echo -n '   - Iptables Firewall'
 fi
 if [ "$iptables" = 'yes' ] && [ "$fail2ban" = 'yes' ]; then
-    echo -n ' + Fail2Ban'
+    echo ' + Fail2Ban'
 fi
 if [ "$ipv4" = 'yes' ]; then
     echo '   - IPV4'

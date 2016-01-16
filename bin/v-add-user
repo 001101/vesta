@@ -59,10 +59,10 @@ is_package_valid
 # Parsing package data
 pkg_data=$(cat $VESTA/data/packages/$package.pkg |grep -v TIME |grep -v DATE)
 
-pkg_data=$(echo $pkg_data | sed "s|WEB_TEMPLATE='|WEB_TEMPLATE='$tpldir/|g")
-pkg_data=$(echo $pkg_data | sed "s|BACKEND_TEMPLATE='|BACKEND_TEMPLATE='$tpldir/|g")
-pkg_data=$(echo $pkg_data | sed "s|PROXY_TEMPLATE='|PROXY_TEMPLATE='$tpldir/|g")
-pkg_data=$(echo $pkg_data | sed "s|DNS_TEMPLATE='|DNS_TEMPLATE='$tpldir/|g")
+pkg_data=$(echo $pkg_data | sed "s|EB_TEMPLATE='|EB_TEMPLATE='$tpldir/|g")
+pkg_data=$(echo $pkg_data | sed "s|ACKEND_TEMPLATE='|ACKEND_TEMPLATE='$tpldir/|g")
+pkg_data=$(echo $pkg_data | sed "s|ROXY_TEMPLATE='|ROXY_TEMPLATE='$tpldir/|g")
+pkg_data=$(echo $pkg_data | sed "s|NS_TEMPLATE='|NS_TEMPLATE='$tpldir/|g")
 
 # Checking shell
 shell_conf=$(echo "$pkg_data" | grep 'SHELL' | cut -f 2 -d \')

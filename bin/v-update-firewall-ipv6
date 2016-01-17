@@ -81,7 +81,7 @@ for line in $(sort -r -n -k 2 -t \' $rules); do
         fi
 
         # Accepting all dst ports
-        if [[ "$PORT" = "0" ]] || [ "$PROTOCOL" = 'ICMP' ]; then
+        if [[ "$PORT" = "0" ]] || [ "$PROTOCOL" = 'ICMPV6' ]; then
             port=""
         fi
 

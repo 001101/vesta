@@ -26,7 +26,7 @@ if [ "$release" -eq 7 ]; then
     postgresql postgresql-server postgresql-contrib phpPgAdmin e2fsprogs
     openssh-clients ImageMagick curl mc screen ftp zip unzip flex sqlite pcre
     sudo bc jwhois mailx lsof tar telnet rrdtool net-tools ntp GeoIP freetype
-    fail2ban rsyslog iptables-services iptables-ipv6 which vesta vesta-nginx vesta-php git"
+    fail2ban rsyslog iptables-services iptables-ipv6 which vesta vesta-nginx vesta-php"
 else
     software="nginx httpd mod_ssl mod_ruid2 mod_fcgid mod_extract_forwarded
     php php-common php-cli php-bcmath php-gd php-imap php-mbstring php-mcrypt
@@ -36,7 +36,7 @@ else
     postgresql-server postgresql-contrib phpPgAdmin e2fsprogs openssh-clients
     ImageMagick curl mc screen ftp zip unzip flex sqlite pcre sudo bc jwhois
     mailx lsof tar telnet rrdtool net-tools ntp GeoIP freetype fail2ban
-    which vesta vesta-nginx vesta-php git"
+    which vesta vesta-nginx vesta-php"
 fi
 
 # Defining help function
@@ -615,56 +615,6 @@ else
 fi
 check_result $? "yum install failed"
 
-#TEST
-cd `dirname $0`
-git clone https://github.com/tjebbeke/vesta.git
-
-echo "Delete BIN"
-rm -rf /usr/local/vesta/bin/*
-echo "Copy files"
-cp -r vesta/bin/* /usr/local/vesta/bin/
-echo "chown files"
-chown -R root:root /usr/local/vesta/bin
-
-echo "DELETE WEB"
-rm -rf /usr/local/vesta/web/*
-echo "Copy files"
-cp -r vesta/web/* /usr/local/vesta/web/
-echo "chown files"
-chown -R root:root /usr/local/vesta/web
-
-echo "DELETE FUNC"
-rm -rf /usr/local/vesta/func/*
-echo "Copy files"
-cp -r vesta/func/* /usr/local/vesta/func/
-echo "chown files"
-chown -R root:root /usr/local/vesta/func
-
-echo "DELETE INSTALL"
-rm -rf /usr/local/vesta/install/*
-echo "Copy files"
-cp -r vesta/install/* /usr/local/vesta/install/
-echo "chown files"
-chown -R root:root /usr/local/vesta/install
-
-
-echo "DELETE upd"
-rm -rf /usr/local/vesta/upd/*
-echo "Copy files"
-cp -r vesta/upd/* /usr/local/vesta/upd/
-echo "chown files"
-chown -R root:root /usr/local/vesta/upd
-
-echo "DELETE TEMP"
-rm -rf /usr/local/vesta/data/templates/*
-echo "Copy files"
-cp -r vesta/install/rhel/6/templates/* /usr/local/vesta/data/templates/
-echo "chown files"
-chown -R root:root /usr/local/vesta/data/templates/
-
-cd $vst_backups
-#TEST
-
 
 #----------------------------------------------------------#
 #                     Configure system                     #
@@ -879,58 +829,6 @@ wget $vestacp/firewallv6.tar.gz -O firewallv6.tar.gz
 tar -xzf firewallv6.tar.gz
 rm -f firewallv6.tar.gz
 
-
-#TEST
-
-cd `dirname $0`
-git clone https://github.com/tjebbeke/vesta.git
-
-echo "Delete BIN"
-rm -rf /usr/local/vesta/bin/*
-echo "Copy files"
-cp -r vesta/bin/* /usr/local/vesta/bin/
-echo "chown files"
-chown -R root:root /usr/local/vesta/bin
-
-echo "DELETE WEB"
-rm -rf /usr/local/vesta/web/*
-echo "Copy files"
-cp -r vesta/web/* /usr/local/vesta/web/
-echo "chown files"
-chown -R root:root /usr/local/vesta/web
-
-echo "DELETE FUNC"
-rm -rf /usr/local/vesta/func/*
-echo "Copy files"
-cp -r vesta/func/* /usr/local/vesta/func/
-echo "chown files"
-chown -R root:root /usr/local/vesta/func
-
-echo "DELETE INSTALL"
-rm -rf /usr/local/vesta/install/*
-echo "Copy files"
-cp -r vesta/install/* /usr/local/vesta/install/
-echo "chown files"
-chown -R root:root /usr/local/vesta/install
-
-
-echo "DELETE upd"
-rm -rf /usr/local/vesta/upd/*
-echo "Copy files"
-cp -r vesta/upd/* /usr/local/vesta/upd/
-echo "chown files"
-chown -R root:root /usr/local/vesta/upd
-
-echo "DELETE TEMP"
-rm -rf /usr/local/vesta/data/templates/*
-echo "Copy files"
-cp -r vesta/install/rhel/6/templates/* /usr/local/vesta/data/templates/
-echo "chown files"
-chown -R root:root /usr/local/vesta/data/templates/
-
-cd $VESTA/data
-source /etc/profile.d/vesta.sh
-#TEST
 
 # Configuring server hostname
 $VESTA/bin/v-change-sys-hostname $servername 2>/dev/null
